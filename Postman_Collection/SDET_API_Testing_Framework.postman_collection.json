@@ -1,0 +1,2170 @@
+{
+  "info": {
+    "name": "SDET API Testing Framework",
+    "_postman_id": "6ab5267b-6c0a-4bf2-96bd-fresher-sdet-api",
+    "description": "Portfolio-grade Postman collection for API testing, validation, smoke testing, regression testing, negative testing, and defect discovery using ReqRes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication Testing",
+      "item": [
+        {
+          "name": "Successful Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Successful Login.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"eve.holt@reqres.in\",\n  \"password\": \"cityslicka\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"token\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "",
+                  "",
+                  "pm.test(\"Authentication token exists and is stored\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.token).to.be.a(\"string\").and.not.empty;",
+                  "  pm.environment.set(\"authToken\", json.token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Failed Login - Missing Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Failed Login - Missing Password.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"peter@klaven\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"error\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is validated\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"error\");",
+                  "  pm.expect(String(json.error).toLowerCase()).to.include(\"missing password\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Failed Login - Missing Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Failed Login - Missing Email.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"cityslicka\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"error\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is validated\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"error\");",
+                  "  pm.expect(String(json.error).toLowerCase()).to.include(\"email\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Successful Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Successful Registration.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"eve.holt@reqres.in\",\n  \"password\": \"pistol\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"id\",\"token\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "",
+                  "",
+                  "pm.test(\"Authentication token exists and is stored\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.token).to.be.a(\"string\").and.not.empty;",
+                  "  pm.environment.set(\"authToken\", json.token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Failed Registration - Missing Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Failed Registration - Missing Password.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sydney@fife\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"error\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is validated\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"error\");",
+                  "  pm.expect(String(json.error).toLowerCase()).to.include(\"missing password\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Failed Registration - Missing Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Failed Registration - Missing Email.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"pistol\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"error\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is validated\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"error\");",
+                  "  pm.expect(String(json.error).toLowerCase()).to.include(\"email\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User API Testing",
+      "item": [
+        {
+          "name": "Get Single User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Get Single User."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"data\",\"support\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "pm.test(\"User object has required fields\", function () { const data = pm.response.json().data; ['id','email','first_name','last_name','avatar'].forEach((field) => pm.expect(data).to.have.property(field)); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?page=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Automated API validation for Get User List."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"page\",\"per_page\",\"total\",\"total_pages\",\"data\",\"support\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "pm.test(\"Data is a non-empty array\", function () { pm.expect(pm.response.json().data).to.be.an('array').and.not.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Create User.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"morpheus\",\n  \"job\": \"leader\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"name\",\"job\",\"id\",\"createdAt\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "pm.test(\"Created user id is stored\", function () { pm.environment.set('createdUserId', pm.response.json().id); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Update User.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"morpheus\",\n  \"job\": \"zion resident\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"name\",\"job\",\"updatedAt\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Delete User."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.equal(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "User Not Found",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/23",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "23"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for User Not Found."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test(\"Not found response is an empty object\", function () { pm.expect(pm.response.json()).to.deep.equal({}); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Negative Testing",
+      "item": [
+        {
+          "name": "Invalid Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/invalid-endpoint",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invalid-endpoint"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Invalid Endpoint."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid Request Payload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Invalid Request Payload.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": 12345,\n  \"job\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"id\",\"createdAt\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "pm.test(\"Defect observation: invalid schema is accepted by demo API\", function () { pm.expect(pm.response.code).to.equal(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Empty Body",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Empty Body.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"id\",\"createdAt\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "pm.test(\"Defect observation: mandatory fields are not enforced by demo API\", function () { pm.expect(pm.response.json()).to.have.property('id'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "abc"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Invalid User ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unauthorized Access",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Unauthorized Access."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Missing Mandatory Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Missing Mandatory Fields.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"error\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Smoke Testing",
+      "item": [
+        {
+          "name": "Smoke - Login API",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Smoke - Login API.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"eve.holt@reqres.in\",\n  \"password\": \"cityslicka\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"token\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "",
+                  "",
+                  "pm.test(\"Authentication token exists and is stored\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.token).to.be.a(\"string\").and.not.empty;",
+                  "  pm.environment.set(\"authToken\", json.token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Smoke - Registration API",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Smoke - Registration API.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"eve.holt@reqres.in\",\n  \"password\": \"pistol\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"id\",\"token\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Smoke - User Retrieval API",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Smoke - User Retrieval API."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"data\",\"support\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Regression Testing",
+      "item": [
+        {
+          "name": "Regression - Successful Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Regression - Successful Login.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"eve.holt@reqres.in\",\n  \"password\": \"cityslicka\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"token\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "",
+                  "",
+                  "pm.test(\"Authentication token exists and is stored\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.token).to.be.a(\"string\").and.not.empty;",
+                  "  pm.environment.set(\"authToken\", json.token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regression - Failed Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Regression - Failed Login.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"peter@klaven\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"error\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is validated\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property(\"error\");",
+                  "  pm.expect(String(json.error).toLowerCase()).to.include(\"missing password\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regression - Get User List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?page=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Automated API validation for Regression - Get User List."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"page\",\"data\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regression - Get Single User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Regression - Get Single User."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"data\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regression - Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Regression - Create User.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"trinity\",\n  \"job\": \"qa analyst\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"id\",\"createdAt\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regression - Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Regression - Update User.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"trinity\",\n  \"job\": \"senior qa analyst\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"updatedAt\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regression - Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Regression - Delete User."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.equal(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regression - User Not Found",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/23",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "23"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Regression - User Not Found."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regression - Empty Body Edge Case",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Reqres-Env",
+                "value": "{{reqresEnv}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": []
+            },
+            "description": "Automated API validation for Regression - Empty Body Edge Case.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is below configured SLA\", function () {",
+                  "  const limit = Number(pm.environment.get(\"responseTimeLimit\") || 1000);",
+                  "  pm.expect(pm.response.responseTime).to.be.below(limit);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is valid for this scenario\", function () {",
+                  "  const bodyText = pm.response.text();",
+                  "  pm.expect(bodyText.length).to.be.above(0); const json = pm.response.json(); pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"Required response fields are present\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const requiredFields = [\"id\",\"createdAt\"];",
+                  "  requiredFields.forEach((field) => pm.expect(json, \"missing \" + field).to.have.property(field));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

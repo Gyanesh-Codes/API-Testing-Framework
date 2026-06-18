@@ -1,0 +1,18 @@
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+
+# Logs and generated reports
+*.log
+newman/
+reports/html/
+
+# Local environment files
+.env
+.env.*
+!.env.example
